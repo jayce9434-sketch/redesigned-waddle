@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#070b16" />
+  <title>Orbit Darts</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar glass">
+      <button class="brand" data-view="play" aria-label="Orbit Darts home">
+        <img src="icon.png" alt="" class="brand-icon" />
+        <span>
+          <strong>ORBIT DARTS</strong>
+          <small>Precision arcade progression</small>
+        </span>
+      </button>
+      <div class="wallet">
+        <div class="currency coin"><span class="currency-mark">C</span><span id="coinsText">0</span></div>
+        <div class="currency prism"><span class="currency-mark">P</span><span id="prismsText">0</span></div>
+        <div class="level-chip">LV <span id="accountLevelText">1</span></div>
+      </div>
+    </header>
+
+    <main>
+      <section id="view-play" class="view active">
+        <div class="play-layout">
+          <aside class="left-rail glass">
+            <div class="eyebrow">CURRENT RUN</div>
+            <div class="stage-line"><span>STAGE</span><strong id="stageText">1</strong></div>
+            <div class="progress-track"><i id="stageProgress"></i></div>
+            <div class="stat-grid">
+              <div><span>Combo</span><b id="comboText">x1.00</b></div>
+              <div><span>Best</span><b id="bestComboText">x1.00</b></div>
+              <div><span>Shots</span><b id="shotsText">0</b></div>
+              <div><span>Lives</span><b id="livesText">3</b></div>
+            </div>
+            <div class="divider"></div>
+            <div class="effect-mini">
+              <div class="effect-swatch" id="equippedSwatch"></div>
+              <div>
+                <span class="eyebrow">EQUIPPED EFFECT</span>
+                <strong id="equippedName">Starter Trail</strong>
+                <small id="equippedBoost">No bonus</small>
+              </div>
+            </div>
+            <button class="secondary wide" id="pauseBtn">Pause Run</button>
+          </aside>
+
+          <section class="game-card glass">
+            <div class="game-topline">
+              <div>
+                <span class="eyebrow">TARGET PATTERN</span>
+                <strong id="patternName">Classic Orbit</strong>
+              </div>
+              <div class="mission-chip"><span id="missionLabel">Mission</span><b id="missionText">Land 8 darts</b></div>
+            </div>
+            <canvas id="gameCanvas" width="840" height="840" aria-label="Orbit Darts play field"></canvas>
+            <div class="shoot-zone">
+              <button id="shootBtn" class="shoot-button">
+                <span>SHOOT</span>
+                <small>Tap canvas or press Space</small>
+              </button>
+            </div>
+            <div class="run-banner hidden" id="runBanner"></div>
+          </section>
+
+          <aside class="right-rail glass">
+            <div class="eyebrow">QUICK ACTIONS</div>
+            <nav class="quick-nav">
+              <button data-view="upgrades"><span>UP</span><div><b>Upgrades</b><small>Permanent power</small></div></button>
+              <button data-view="effects"><span>FX</span><div><b>Effects</b><small>Roll and equip</small></div></button>
+              <button data-view="daily"><span>DY</span><div><b>Daily Arcade</b><small>Wheel, scratch, memory</small></div></button>
+              <button data-view="passes"><span>PS</span><div><b>Permanent Passes</b><small>Late-game unlocks</small></div></button>
+              <button data-view="settings"><span>ST</span><div><b>Settings</b><small>Audio and accessibility</small></div></button>
+            </nav>
+            <div class="divider"></div>
+            <div class="boss-card" id="bossPreview">
+              <span class="eyebrow">NEXT BOSS</span>
+              <b id="bossStageText">Stage 5</b>
+              <p id="bossDescription">Split Core changes speed after every hit.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="view-upgrades" class="view panel-view">
+        <div class="panel-shell glass">
+          <div class="panel-header"><div><span class="eyebrow">PROGRESSION LAB</span><h1>Permanent Upgrades</h1><p>Spend Coins earned from clean shots, streaks, missions, bosses and arcade rewards.</p></div><button class="close-panel" data-view="play">Back to Game</button></div>
+          <div id="upgradeGrid" class="card-grid upgrades-grid"></div>
+        </div>
+      </section>
+
+      <section id="view-effects" class="view panel-view">
+        <div class="panel-shell glass">
+          <div class="panel-header"><div><span class="eyebrow">EFFECT VAULT</span><h1>Dart Effects</h1><p>Effects change the dart art, trail, impact burst, and gameplay boosts.</p></div><button class="close-panel" data-view="play">Back to Game</button></div>
+          <div class="effects-top">
+            <div class="roll-machine">
+              <div class="roll-orb" id="rollOrb"><i></i><b id="rollPreview">READY</b></div>
+              <div>
+                <span class="eyebrow">STANDARD ROLL</span>
+                <h2>250 Coins</h2>
+                <p>Pity: Epic+ by 30 rolls, Legendary+ by 80 rolls. Duplicate effects become Shards.</p>
+                <div class="roll-actions">
+                  <button class="primary" id="rollOneBtn">Roll 1</button>
+                  <button class="secondary" id="rollThreeBtn">Triple Roll</button>
+                </div>
+                <small id="tripleRollHint">Requires Triple Roll License.</small>
+              </div>
+            </div>
+            <div class="pity-card">
+              <span class="eyebrow">COLLECTION STATUS</span>
+              <div><b id="ownedEffectsText">0/0</b><span>Effects owned</span></div>
+              <div><b id="shardsText">0</b><span>Effect Shards</span></div>
+              <div><b id="pityText">0 / 30</b><span>Epic pity</span></div>
+            </div>
+          </div>
+          <div id="effectsGrid" class="card-grid effects-grid"></div>
+        </div>
+      </section>
+
+      <section id="view-daily" class="view panel-view">
+        <div class="panel-shell glass">
+          <div class="panel-header"><div><span class="eyebrow">DAILY ARCADE</span><h1>Three Daily Games</h1><p>Each has one free use per day. Prisms can refresh a game instantly.</p></div><button class="close-panel" data-view="play">Back to Game</button></div>
+          <div class="daily-tabs">
+            <button class="active" data-daily="wheel">Prize Wheel</button>
+            <button data-daily="scratch">Scratch Ticket</button>
+            <button data-daily="memory">Memory Grid</button>
+          </div>
+          <div id="dailyWheel" class="daily-pane active">
+            <div class="wheel-layout">
+              <div class="wheel-wrap"><div class="wheel-pointer"></div><canvas id="wheelCanvas" width="560" height="560"></canvas></div>
+              <div class="daily-info"><span class="eyebrow">5% GRAND PRIZE SLOT</span><h2>Daily Prize Wheel</h2><p>One free spin every calendar day. Better slots are rarer and the grand prize is always visible.</p><div id="wheelStatus" class="status-box"></div><button class="primary" id="spinWheelBtn">Spin Free</button><button class="secondary" id="refreshWheelBtn">Refresh for 20 Prisms</button></div>
+            </div>
+          </div>
+          <div id="dailyScratch" class="daily-pane">
+            <div class="scratch-layout">
+              <div id="scratchGrid" class="scratch-grid"></div>
+              <div class="daily-info"><span class="eyebrow">THREE GRAND PRIZES</span><h2>Vault Scratch</h2><p>Reveal six panels. Rewards range from Coins and Prisms to high-rarity effects. Stronger rewards have lower odds.</p><div id="scratchStatus" class="status-box"></div><button class="primary" id="newScratchBtn">Start Free Ticket</button><button class="secondary" id="refreshScratchBtn">Refresh for 15 Prisms</button></div>
+            </div>
+          </div>
+          <div id="dailyMemory" class="daily-pane">
+            <div class="memory-layout">
+              <div id="memoryGrid" class="memory-grid"></div>
+              <div class="daily-info"><span class="eyebrow">SPEED REWARD</span><h2>Signal Memory</h2><p>Match all eight pairs. Fewer moves means a larger payout, with a small chance for an Effect Capsule.</p><div id="memoryStatus" class="status-box"></div><button class="primary" id="startMemoryBtn">Start Free Game</button><button class="secondary" id="refreshMemoryBtn">Refresh for 12 Prisms</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-passes" class="view panel-view">
+        <div class="panel-shell glass">
+          <div class="panel-header"><div><span class="eyebrow">LATE-GAME VAULT</span><h1>Permanent Passes</h1><p>Hard to obtain, permanent account upgrades bought with Prisms earned in-game.</p></div><button class="close-panel" data-view="play">Back to Game</button></div>
+          <div id="passesGrid" class="card-grid passes-grid"></div>
+        </div>
+      </section>
+
+      <section id="view-settings" class="view panel-view">
+        <div class="panel-shell glass settings-shell">
+          <div class="panel-header"><div><span class="eyebrow">SYSTEM</span><h1>Settings</h1><p>Saved automatically on this device.</p></div><button class="close-panel" data-view="play">Back to Game</button></div>
+          <div class="settings-list">
+            <div class="setting-row"><div><b>Master Volume</b><p>0% to 20,000%. Very high values are intentionally compressed to avoid destructive clipping.</p></div><div class="range-stack"><input id="volumeRange" type="range" min="0" max="20000" step="25" /><strong id="volumeText">100%</strong></div></div>
+            <div class="setting-row"><div><b>Screen Shake</b><p>Impact movement on collisions, boss changes and rare drops.</p></div><button class="toggle" id="shakeToggle">On</button></div>
+            <div class="setting-row"><div><b>Particles</b><p>Trails, impact shards, boss aura and effect visuals.</p></div><button class="toggle" id="particlesToggle">On</button></div>
+            <div class="setting-row"><div><b>Reduced Motion</b><p>Simplifies large transitions while keeping gameplay readable.</p></div><button class="toggle" id="motionToggle">Off</button></div>
+            <div class="setting-row danger"><div><b>Reset Save Data</b><p>Deletes progression, effects, passes, currency and daily status on this browser.</p></div><button class="secondary" id="resetDataBtn">Reset Everything</button></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toastStack" class="toast-stack"></div>
+    <div id="modal" class="modal hidden"><div class="modal-card glass"><button id="modalClose" class="modal-x">Close</button><div id="modalContent"></div></div></div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
